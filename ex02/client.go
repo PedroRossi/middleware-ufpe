@@ -1,13 +1,13 @@
 package main
 
 import (
-	"os"
 	"fmt"
 	"log"
 	"net"
-	"sync"
-  "time"
+	"os"
 	"strconv"
+	"sync"
+	"time"
 )
 
 func ping(protocol, addr, text string, wg *sync.WaitGroup) {
@@ -37,13 +37,13 @@ func main() {
 	if err != nil {
 		log.Fatal(err)
 	}
-  start := time.Now()
+	start := time.Now()
 	var wg sync.WaitGroup
 	for i := 0; i < threads; i++ {
 		wg.Add(1)
 		go ping(protocol, addr, text, &wg)
 	}
 	wg.Wait()
-  elapsed := time.Since(start)
-  fmt.Printf("%s\n", elapsed)
+	elapsed := time.Since(start)
+	fmt.Printf("%s\n", elapsed)
 }

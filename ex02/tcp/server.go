@@ -3,23 +3,39 @@ package main
 import (
 	"log"
 	"net"
+	"strconv"
 )
 
-func catHandler(conn net.Conn) {
-	for {
-		message := make([]byte, 4096)
-		length, err := conn.Read(message)
+func fib(n int) int {
+	if n <= 0 {
+		return -1
+	} else if n <= 2 {
+		return 1
+	}
+	return fib(n-1) + fib(n-2)
+}
+
+func handler(conn net.Conn) {
+	defer conn.Close()
+
+	buf := make([]byte, 4)
+	length, err := conn.Read(buf)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	if length > 0 {
+		n, err := strconv.Atoi(string(buf[:length]))
 		if err != nil {
-			break
+			log.Fatal(err)
 		}
-		if length > 0 {
-			_, err = conn.Write(message)
-			if err != nil {
-				break
-			}
+		f := fib(n)
+		r := strconv.Itoa(f)
+		_, err = conn.Write([]byte(r))
+		if err != nil {
+			log.Fatal(err)
 		}
 	}
-	conn.Close()
 }
 
 func main() {
@@ -34,6 +50,6 @@ func main() {
 		if err != nil {
 			log.Println(err)
 		}
-		go catHandler(conn)
+		go handler(conn)
 	}
 }

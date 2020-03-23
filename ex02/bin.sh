@@ -1,8 +1,12 @@
 #!/bin/bash
 for i in {1..5}
 do
-  for j in {1..10000}
+  echo $i
+  range=$[10000 / $i]
+  j=0
+  while [ $j -lt $range ]
   do
-     ./client $i $1 localhost:8080 package >> $1/$i.txt
+    j=$[$j+1]
+    ./client $i $1 localhost:8080 20 >> $1/$i.txt
   done
 done

@@ -10,10 +10,8 @@ import (
 	"time"
 )
 
-func ping(protocol, addr, text string, wg *sync.WaitGroup) {
+func ping(clientN int, protocol, addr, text string, wg *sync.WaitGroup) {
 	defer wg.Done()
-
-	start := time.Now()
 
 	conn, err := net.Dial(protocol, addr)
 	if err != nil {
@@ -21,15 +19,19 @@ func ping(protocol, addr, text string, wg *sync.WaitGroup) {
 	}
 	defer conn.Close()
 
-	fmt.Fprintf(conn, text)
-	buffer := make([]byte, 1024)
-	_, err = conn.Read(buffer)
-	if err != nil {
-		log.Fatal(err)
-	}
+	for i := 0; i < 10000; i++ {
+		start := time.Now()
 
-	elapsed := time.Since(start)
-	fmt.Printf("%s\n", elapsed)
+		fmt.Fprintf(conn, text)
+		buffer := make([]byte, 1024)
+		_, err = conn.Read(buffer)
+		if err != nil {
+			log.Fatal(err)
+		}
+
+		elapsed := time.Since(start)
+		fmt.Printf("%d:%s\n", clientN, elapsed)
+	}
 }
 
 func main() {
@@ -45,7 +47,7 @@ func main() {
 	var wg sync.WaitGroup
 	for i := 0; i < threads; i++ {
 		wg.Add(1)
-		go ping(protocol, addr, text, &wg)
+		go ping(i, protocol, addr, text, &wg)
 	}
 	wg.Wait()
 }

@@ -7,7 +7,7 @@ import (
 
 func catHandler(conn net.Conn) {
 	for {
-		message := make([]byte, 4096)
+		message := make([]byte, 1024)
 		length, err := conn.Read(message)
 		if err != nil {
 			break
